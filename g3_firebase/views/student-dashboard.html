@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard · Vota</title>
+  <link rel="stylesheet" href="/css/shared.css">
+</head>
+<body>
+<div class="dash-page">
+  <header class="dash-header">
+    <div class="dash-header-left">
+      <div class="dash-logo">🗳️</div>
+      <h1>Student Union Voting</h1>
+    </div>
+    <div class="dash-header-right">
+      <div class="dash-user-chip">
+        <div class="user-avatar" id="userInitial">?</div>
+        <span id="username">Student</span>
+      </div>
+      <button class="btn-logout" id="logoutBtn">Logout</button>
+    </div>
+  </header>
+
+  <main class="dash-body">
+    <div class="dash-greeting">
+      <h2>Hello, <span id="greetName">there</span>! 👋</h2>
+      <p>Select an active election below and cast your votes.</p>
+    </div>
+    <div id="electionsContainer">
+      <div class="empty-state"><div class="empty-icon">⏳</div><p>Loading elections…</p></div>
+    </div>
+  </main>
+</div>
+
+<!-- Vote Modal -->
+<div class="modal-overlay" id="voteModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 id="modalTitle">Vote</h2>
+      <button class="modal-close" id="modalClose">✕</button>
+    </div>
+    <div class="modal-body" id="candidatesList"></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
+<script src="/js/firebase-config.js"></script>
+<script src="/js/student-dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Portal · Vota</title>
+  <link rel="stylesheet" href="/css/shared.css">
+</head>
+<body>
+<div class="auth-page">
+
+  <div class="auth-left">
+    <div class="auth-left-bg"></div>
+    <div class="auth-left-orb orb-1"></div>
+    <div class="auth-left-orb orb-2"></div>
+    <div class="auth-left-content">
+      <div class="auth-left-logo">
+        <div class="logo-glass">🗳️</div>
+        <span class="brand-name">Vota</span>
+      </div>
+      <div class="auth-left-hero">
+        <h2>Your voice <span class="highlight">shapes</span> the future.</h2>
+        <p>Cast your vote for student representatives and make your opinion count.</p>
+      </div>
+      <div class="auth-features">
+        <div class="feature-item"><div class="feature-icon">🔒</div><span>Secure &amp; anonymous voting</span></div>
+        <div class="feature-item"><div class="feature-icon">⚡</div><span>Real-time results</span></div>
+        <div class="feature-item"><div class="feature-icon">✅</div><span>One vote per position</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="auth-form-wrap">
+      <div class="auth-header-row">
+        <div class="auth-brand-mini">
+          <div class="brand-dot-glass">🗳️</div>
+          <span class="brand-text">Student Portal</span>
+        </div>
+      </div>
+
+      <div class="auth-heading">
+        <h1 class="auth-title" id="authTitle">Welcome back</h1>
+        <p class="auth-subtitle" id="authSub">Sign in to access the student voting portal.</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin" onclick="showTab('login')">Login</button>
+        <button class="auth-tab" id="tabSignup" onclick="showTab('signup')">Sign Up</button>
+      </div>
+
+      <!-- Login -->
+      <form class="auth-form" id="loginForm">
+        <div class="form-field">
+          <label>Email Address</label>
+          <div class="field-wrap">
+            <input type="email" id="loginEmail" placeholder="you@university.edu" required>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Password</label>
+          <div class="field-wrap">
+            <input type="password" id="loginPwd" placeholder="Your password" required>
+          </div>
+        </div>
+        <button type="submit" class="btn-submit">Sign In →</button>
+        <div class="alert" id="loginAlert"></div>
+      </form>
+
+      <!-- Signup -->
+      <form class="auth-form" id="signupForm" style="display:none">
+        <div class="form-field">
+          <label>Student ID</label>
+          <div class="field-wrap">
+            <input type="text" id="signupId" placeholder="e.g. STU2024001" required>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Full Name</label>
+          <div class="field-wrap">
+            <input type="text" id="signupUsername" placeholder="Your full name" required>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Email Address</label>
+          <div class="field-wrap">
+            <input type="email" id="signupEmail" placeholder="you@university.edu" required>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Password</label>
+          <div class="field-wrap">
+            <input type="password" id="signupPwd" placeholder="Min 6 characters" required>
+          </div>
+        </div>
+        <button type="submit" class="btn-submit">Create Account →</button>
+        <div class="alert" id="signupAlert"></div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDKs (compat version — works without bundler) -->
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
+<script src="/js/firebase-config.js"></script>
+<script>
+  // Redirect if already logged in
+  fbAuth.onAuthStateChanged(user => {
+    if (user) window.location.href = '/student-dashboard';
+  });
+
+  function showTab(tab) {
+    const isLogin = tab === 'login';
+    document.getElementById('loginForm').style.display  = isLogin ? 'flex' : 'none';
+    document.getElementById('signupForm').style.display = isLogin ? 'none' : 'flex';
+    document.getElementById('tabLogin').classList.toggle('active', isLogin);
+    document.getElementById('tabSignup').classList.toggle('active', !isLogin);
+    document.getElementById('authTitle').textContent = isLogin ? 'Welcome back' : 'Join Vota';
+    document.getElementById('authSub').textContent = isLogin
+      ? 'Sign in to access the student voting portal.'
+      : 'Create your account to start participating.';
+  }
+
+  function showAlert(id, msg, type) {
+    const el = document.getElementById(id);
+    el.textContent = msg; el.className = 'alert show ' + type;
+  }
+
+  // LOGIN
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('.btn-submit');
+    btn.textContent = 'Signing in…'; btn.disabled = true;
+    try {
+      await fbAuth.signInWithEmailAndPassword(
+        document.getElementById('loginEmail').value,
+        document.getElementById('loginPwd').value
+      );
+      // onAuthStateChanged will redirect
+    } catch (err) {
+      showAlert('loginAlert', friendlyError(err.code), 'error');
+      btn.textContent = 'Sign In →'; btn.disabled = false;
+    }
+  });
+
+  // SIGNUP
+  document.getElementById('signupForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('.btn-submit');
+    btn.textContent = 'Creating…'; btn.disabled = true;
+    try {
+      const cred = await fbAuth.createUserWithEmailAndPassword(
+        document.getElementById('signupEmail').value,
+        document.getElementById('signupPwd').value
+      );
+      await cred.user.updateProfile({ displayName: document.getElementById('signupUsername').value });
+
+      // Save student profile to Firestore via server
+      const token = await cred.user.getIdToken();
+      const res = await fetch('/api/student/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          studentId: document.getElementById('signupId').value,
+          username:  document.getElementById('signupUsername').value,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        await cred.user.delete();
+        showAlert('signupAlert', data.message || 'Signup failed', 'error');
+        btn.textContent = 'Create Account →'; btn.disabled = false;
+        return;
+      }
+
+      showAlert('signupAlert', '✓ Account created — redirecting…', 'success');
+      // onAuthStateChanged will redirect
+    } catch (err) {
+      showAlert('signupAlert', friendlyError(err.code), 'error');
+      btn.textContent = 'Create Account →'; btn.disabled = false;
+    }
+  });
+
+  function friendlyError(code) {
+    const map = {
+      'auth/user-not-found':      'No account found with that email.',
+      'auth/wrong-password':      'Incorrect password.',
+      'auth/email-already-in-use':'That email is already registered.',
+      'auth/weak-password':       'Password must be at least 6 characters.',
+      'auth/invalid-email':       'Please enter a valid email address.',
+      'auth/too-many-requests':   'Too many attempts. Please wait and try again.',
+    };
+    return map[code] || 'Something went wrong. Please try again.';
+  }
+</script>
+</body>
+</html>

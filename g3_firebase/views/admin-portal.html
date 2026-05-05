@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal · Vota</title>
+  <link rel="stylesheet" href="/css/shared.css">
+</head>
+<body>
+<div class="auth-page">
+  <div class="auth-left">
+    <div class="auth-left-bg"></div>
+    <div class="auth-left-orb orb-1"></div>
+    <div class="auth-left-orb orb-2"></div>
+    <div class="auth-left-content">
+      <div class="auth-left-logo">
+        <div class="logo-glass">⚙️</div>
+        <span class="brand-name">Vota Admin</span>
+      </div>
+      <div class="auth-left-hero">
+        <h2>Manage elections with <span class="highlight">precision.</span></h2>
+        <p>Access the control panel to create elections, manage candidates, and view live results.</p>
+      </div>
+      <div class="auth-features">
+        <div class="feature-item"><div class="feature-icon">➕</div><span>Create &amp; manage elections</span></div>
+        <div class="feature-item"><div class="feature-icon">👥</div><span>Add &amp; remove candidates</span></div>
+        <div class="feature-item"><div class="feature-icon">📊</div><span>Live results dashboard</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="auth-form-wrap">
+      <div class="auth-header-row">
+        <div class="auth-brand-mini">
+          <div class="brand-dot-glass">⚙️</div>
+          <span class="brand-text">Admin Portal</span>
+        </div>
+      </div>
+      <div class="auth-heading">
+        <h1 class="auth-title">Admin Sign In</h1>
+        <p class="auth-subtitle">Sign in with your admin credentials.</p>
+      </div>
+      <form class="auth-form" id="loginForm">
+        <div class="form-field">
+          <label>Email Address</label>
+          <div class="field-wrap">
+            <input type="email" id="loginEmail" placeholder="admin@yourschool.edu" required>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Password</label>
+          <div class="field-wrap">
+            <input type="password" id="loginPwd" placeholder="Your password" required>
+          </div>
+        </div>
+        <button type="submit" class="btn-submit">Access Dashboard →</button>
+        <div class="alert" id="loginAlert"></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
+<script src="/js/firebase-config.js"></script>
+<script>
+  // Check if already logged in and is admin
+  fbAuth.onAuthStateChanged(async user => {
+    if (user) {
+      const token = await user.getIdTokenResult();
+      if (token.claims.admin) window.location.href = '/admin-dashboard';
+    }
+  });
+
+  function showAlert(id, msg, type) {
+    const el = document.getElementById(id); el.textContent = msg; el.className = 'alert show ' + type;
+  }
+
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('.btn-submit');
+    btn.textContent = 'Signing in…'; btn.disabled = true;
+    try {
+      const cred = await fbAuth.signInWithEmailAndPassword(
+        document.getElementById('loginEmail').value,
+        document.getElementById('loginPwd').value
+      );
+      const tokenResult = await cred.user.getIdTokenResult(true);
+      if (!tokenResult.claims.admin) {
+        await fbAuth.signOut();
+        showAlert('loginAlert', 'This account does not have admin access.', 'error');
+        btn.textContent = 'Access Dashboard →'; btn.disabled = false;
+        return;
+      }
+      // onAuthStateChanged will redirect
+    } catch (err) {
+      const map = { 'auth/user-not-found': 'No account found.', 'auth/wrong-password': 'Incorrect password.', 'auth/invalid-email': 'Invalid email.' };
+      showAlert('loginAlert', map[err.code] || 'Login failed.', 'error');
+      btn.textContent = 'Access Dashboard →'; btn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>

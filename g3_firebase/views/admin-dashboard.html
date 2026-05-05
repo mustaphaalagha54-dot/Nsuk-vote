@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard · Vota</title>
+  <link rel="stylesheet" href="/css/shared.css">
+  <style>
+    .elections-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:1.25rem; margin-bottom:2rem; }
+    .election-card { background:white; border:1.5px solid var(--gray-200); border-radius:var(--radius-md); overflow:hidden; transition:box-shadow .2s; }
+    .election-card:hover { box-shadow:var(--shadow-md); }
+    .election-card-body { padding:1.25rem 1.5rem 1rem; border-bottom:1.5px solid var(--gray-100); }
+    .election-card-name { font-size:1rem; font-weight:800; color:var(--gray-800); margin-bottom:4px; }
+    .election-card-meta { font-size:.78rem; color:var(--gray-400); display:flex; align-items:center; gap:8px; margin-top:8px; }
+    .election-card-footer { padding:.85rem 1.5rem; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .type-chip { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.3px; }
+    .type-chip.positions { background:#eff6ff; color:#1d4ed8; }
+    .type-chip.direct { background:var(--green-light); color:var(--green-1); }
+    .toggle-switch { position:relative; width:42px; height:24px; cursor:pointer; }
+    .toggle-switch input { opacity:0; width:0; height:0; }
+    .toggle-track { position:absolute; inset:0; background:var(--gray-200); border-radius:12px; transition:background .2s; }
+    .toggle-switch input:checked + .toggle-track { background:var(--green-3); }
+    .toggle-thumb { position:absolute; top:3px; left:3px; width:18px; height:18px; background:white; border-radius:50%; transition:transform .2s; box-shadow:0 1px 4px rgba(0,0,0,.2); }
+    .toggle-switch input:checked ~ .toggle-thumb { transform:translateX(18px); }
+    .status-label { font-size:.8rem; font-weight:700; }
+    .status-label.active { color:var(--green-2); }
+    .status-label.closed { color:var(--gray-400); }
+    .btn-manage { padding:8px 16px; background:var(--green-light); color:var(--green-2); border:1.5px solid var(--green-mid); border-radius:30px; font-family:inherit; font-size:.8rem; font-weight:700; cursor:pointer; transition:all .2s; }
+    .btn-manage:hover { background:var(--green-mid); }
+    .btn-del-election { padding:8px 14px; background:#fff0f0; color:#c0392b; border:1.5px solid #fecaca; border-radius:30px; font-family:inherit; font-size:.8rem; font-weight:700; cursor:pointer; }
+    .type-selector { display:flex; gap:8px; }
+    .type-option { position:relative; }
+    .type-option input { position:absolute; opacity:0; }
+    .type-option label { display:flex; flex-direction:column; align-items:center; gap:5px; padding:10px 18px; border:1.5px solid var(--gray-200); border-radius:var(--radius-sm); cursor:pointer; font-size:.82rem; font-weight:600; color:var(--gray-600); background:var(--gray-50); transition:all .2s; }
+    .type-option input:checked + label { border-color:var(--green-3); background:var(--green-light); color:var(--green-1); }
+    .manage-overlay { display:none; position:fixed; inset:0; background:rgba(10,40,20,.6); backdrop-filter:blur(5px); z-index:200; align-items:center; justify-content:center; }
+    .manage-overlay.open { display:flex; }
+    .manage-box { background:white; border-radius:var(--radius-lg); width:95%; max-width:680px; max-height:88vh; display:flex; flex-direction:column; box-shadow:var(--shadow-lg); }
+    .manage-header { padding:1.5rem 1.75rem 1rem; border-bottom:1.5px solid var(--gray-100); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+    .manage-header h2 { font-size:1.1rem; font-weight:800; color:var(--gray-800); }
+    .manage-body { overflow-y:auto; flex:1; padding:1.5rem 1.75rem; display:flex; flex-direction:column; gap:1.25rem; }
+    .pos-block { border:1.5px solid var(--gray-200); border-radius:var(--radius-sm); overflow:hidden; }
+    .pos-block-head { display:flex; align-items:center; justify-content:space-between; padding:.85rem 1.1rem; background:var(--gray-50); border-bottom:1.5px solid var(--gray-200); gap:10px; }
+    .pos-block-head h4 { font-size:.9rem; font-weight:700; color:var(--gray-800); }
+    .pos-candidates { padding:.75rem 1.1rem; display:flex; flex-direction:column; gap:7px; }
+    .mini-cand { display:flex; align-items:center; justify-content:space-between; padding:.6rem .85rem; background:var(--gray-50); border-radius:6px; font-size:.85rem; font-weight:600; color:var(--gray-800); gap:8px; }
+    .mini-cand-info { font-size:.72rem; color:var(--gray-400); }
+    .inline-row { display:flex; gap:8px; margin-top:6px; }
+    .inline-input { flex:1; padding:9px 13px; border:1.5px solid var(--gray-200); border-radius:var(--radius-sm); font-family:inherit; font-size:.88rem; outline:none; }
+    .inline-input:focus { border-color:var(--green-3); }
+    .btn-inline-add { padding:9px 16px; background:linear-gradient(135deg,var(--green-2),var(--green-3)); color:white; border:none; border-radius:var(--radius-sm); font-family:inherit; font-size:.82rem; font-weight:700; cursor:pointer; white-space:nowrap; }
+    .btn-mini-del { background:none; border:none; cursor:pointer; color:#e74c3c; font-size:.85rem; padding:2px 6px; border-radius:4px; }
+    .btn-mini-del:hover { background:#fef2f2; }
+    .result-election { margin-bottom:2rem; }
+    .result-election-header { display:flex; align-items:center; gap:10px; margin-bottom:1rem; padding-bottom:.75rem; border-bottom:1.5px solid var(--gray-100); }
+    .result-election-header h3 { font-size:1rem; font-weight:800; color:var(--gray-800); }
+    .result-pos-label { font-size:.75rem; font-weight:700; color:var(--gray-600); text-transform:uppercase; letter-spacing:.5px; margin:.6rem 0 .4rem; }
+    .result-row { display:flex; align-items:center; justify-content:space-between; padding:.85rem 1.1rem; background:white; border:1.5px solid var(--gray-200); border-radius:var(--radius-sm); margin-bottom:6px; gap:12px; }
+    .result-row.leading { border-color:var(--green-3); background:var(--green-light); }
+    .result-info { flex:1; }
+    .result-info h4 { font-size:.88rem; font-weight:700; color:var(--gray-800); margin-bottom:4px; }
+    .vote-bar-track { width:100%; height:4px; background:var(--gray-100); border-radius:4px; overflow:hidden; }
+    .vote-bar-fill { height:100%; background:linear-gradient(90deg,var(--green-3),var(--green-4)); border-radius:4px; transition:width .6s; }
+    .result-count { font-size:1rem; font-weight:800; color:var(--green-2); }
+  </style>
+</head>
+<body>
+<div class="dash-page">
+  <header class="dash-header">
+    <div class="dash-header-left">
+      <div class="dash-logo">⚙️</div>
+      <h1>Admin Control Panel</h1>
+    </div>
+    <div class="dash-header-right">
+      <div class="dash-user-chip">
+        <div class="user-avatar" id="adminInitial">A</div>
+        <span id="adminUsername">Admin</span>
+      </div>
+      <button class="btn-logout" id="logoutBtn">Logout</button>
+    </div>
+  </header>
+
+  <main class="dash-body">
+    <div class="dash-greeting">
+      <h2>Election Management ⚙️</h2>
+      <p>Create elections, manage candidates, and monitor live results.</p>
+    </div>
+
+    <div class="admin-tabs">
+      <button class="admin-tab-btn active" data-tab="elections">Elections</button>
+      <button class="admin-tab-btn" data-tab="results">Live Results</button>
+    </div>
+
+    <div class="tab-panel active" id="tab-elections">
+      <div class="card-panel">
+        <h3>Create New Election</h3>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
+          <div class="form-field" style="flex:1;min-width:180px">
+            <label style="font-size:.75rem;font-weight:700;color:var(--gray-600);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;display:block">Election Name</label>
+            <input type="text" class="form-field input" id="electionName" placeholder="e.g. SUG Election 2025" style="padding:11px 16px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-family:inherit;font-size:.92rem;color:var(--gray-800);background:var(--gray-50);outline:none;width:100%">
+          </div>
+          <div class="form-field">
+            <label style="font-size:.75rem;font-weight:700;color:var(--gray-600);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;display:block">Type</label>
+            <div class="type-selector">
+              <div class="type-option">
+                <input type="radio" name="electionType" id="typePositions" value="positions" checked>
+                <label for="typePositions"><span style="font-size:1.1rem">🏛️</span>Positions</label>
+              </div>
+              <div class="type-option">
+                <input type="radio" name="electionType" id="typeDirect" value="direct">
+                <label for="typeDirect"><span style="font-size:1.1rem">👤</span>Direct</label>
+              </div>
+            </div>
+          </div>
+          <button class="btn-add" id="createElectionBtn" style="height:46px;align-self:flex-end">+ Create</button>
+        </div>
+        <div class="alert" id="createAlert" style="margin-top:12px"></div>
+      </div>
+
+      <div class="section-header">
+        <h3>All Elections</h3>
+        <span class="section-badge" id="electionsCount">0 total</span>
+      </div>
+      <div class="elections-grid" id="electionsGrid">
+        <div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🗳️</div><p>No elections yet.</p></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-results">
+      <div class="card-panel">
+        <div class="section-header" style="margin-bottom:1.5rem">
+          <h3>Live Voting Results</h3>
+          <span class="yellow-accent">Live</span>
+        </div>
+        <div id="resultsContainer"><div class="empty-state"><div class="empty-icon">📊</div><p>Loading…</p></div></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Manage Modal -->
+<div class="manage-overlay" id="manageModal">
+  <div class="manage-box">
+    <div class="manage-header">
+      <h2 id="manageModalTitle">Manage Election</h2>
+      <button class="modal-close" id="manageModalClose">✕</button>
+    </div>
+    <div class="manage-body" id="manageModalBody"></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
+<script src="/js/firebase-config.js"></script>
+<script src="/js/admin-dashboard.js"></script>
+</body>
+</html>
