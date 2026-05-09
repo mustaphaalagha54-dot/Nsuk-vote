@@ -1,5 +1,5 @@
 // ─── PASTE YOUR FIREBASE CONFIG HERE ──────────────────────────────
-// Firebase Console → Project Settings → Your apps → Web app
+// Get this from: Firebase Console → Project Settings → Your apps → Web app
 const firebaseConfig = {
   apiKey:            "PASTE_YOUR_API_KEY",
   authDomain:        "PASTE_YOUR_PROJECT_ID.firebaseapp.com",
@@ -13,10 +13,18 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const fbAuth = firebase.auth();
 
-// ─── Authenticated fetch — sends Bearer token automatically ───────
-async function authFetch(url, options = {}) {
+// ─── Helpers ──────────────────────────────────────────────────────
+
+// Get the current user's ID token (auto-refreshed by Firebase)
+async function getToken() {
   const user = fbAuth.currentUser;
-  const token = user ? await user.getIdToken() : null;
+  if (!user) return null;
+  return await user.getIdToken();
+}
+
+// Authenticated fetch — adds Bearer token automatically
+async function authFetch(url, options = {}) {
+  const token = await getToken();
   return fetch(url, {
     ...options,
     headers: {
@@ -24,5 +32,18 @@ async function authFetch(url, options = {}) {
       ...(options.headers || {}),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
+  });
+}
+
+// Redirect if not logged in
+function requireLogin(redirectTo) {
+  return new Promise((resolve) => {
+    fbAuth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = redirectTo;
+      } else {
+        resolve(user);
+      }
+    });
   });
 }
