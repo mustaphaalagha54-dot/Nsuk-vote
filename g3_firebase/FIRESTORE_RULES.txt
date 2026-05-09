@@ -1,0 +1,40 @@
+// ─── PASTE THESE INTO: ────────────────────────────────────────────
+// Firebase Console → Firestore → Rules → (replace everything) → Publish
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Students: can read/write their OWN profile document
+    match /students/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Elections: any logged-in user can read, only admins can write
+    match /elections/{elId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.token.admin == true;
+
+      // Candidates: any logged-in user can read, only admins can write
+      match /candidates/{candId} {
+        allow read: if request.auth != null;
+        allow write: if request.auth.token.admin == true;
+      }
+
+      // Votes: any logged-in user can read their own votes,
+      // create once (no updates or deletes ever)
+      match /votes/{voteId} {
+        allow read: if request.auth != null;
+        allow create: if request.auth != null
+          && request.resource.data.voterId == request.auth.uid;
+        allow update, delete: if false;
+      }
+    }
+
+    // Admins collection: only admins can read/write
+    match /admins/{uid} {
+      allow read, write: if request.auth != null
+        && request.auth.token.admin == true;
+    }
+  }
+}
