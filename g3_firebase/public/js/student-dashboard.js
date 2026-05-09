@@ -2,29 +2,24 @@ let currentElectionId = null;
 let currentPositionId = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-
+  // Wait for Firebase Auth to confirm user
   fbAuth.onAuthStateChanged(async user => {
     if (!user) { window.location.href = '/student'; return; }
 
-    // Read profile directly from Firestore client — no server call needed
+    // Load profile
     try {
-      const fsdb = firebase.firestore();
-      const doc  = await fsdb.collection('students').doc(user.uid).get();
-      const name = doc.exists
-        ? (doc.data().username || user.displayName || 'Student')
-        : (user.displayName || 'Student');
-
-      document.getElementById('username').textContent    = name;
-      document.getElementById('greetName').textContent   = name;
+      const res = await authFetch('/api/student/me');
+      const profile = await res.json();
+      const name = profile.username || user.displayName || 'Student';
+      document.getElementById('username').textContent  = name;
+      document.getElementById('greetName').textContent = name;
       document.getElementById('userInitial').textContent = name.charAt(0).toUpperCase();
     } catch {
-      const name = user.displayName || 'Student';
-      document.getElementById('username').textContent    = name;
-      document.getElementById('greetName').textContent   = name;
-      document.getElementById('userInitial').textContent = name.charAt(0).toUpperCase();
+      document.getElementById('username').textContent  = user.displayName || 'Student';
+      document.getElementById('greetName').textContent = user.displayName || 'there';
+      document.getElementById('userInitial').textContent = (user.displayName || 'S').charAt(0).toUpperCase();
     }
 
-    // Load elections via server (needs auth token for vote tracking)
     await loadElections();
   });
 
@@ -34,9 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('modalClose').addEventListener('click', closeModal);
-  document.getElementById('voteModal').addEventListener('click', e => {
-    if (e.target === e.currentTarget) closeModal();
-  });
+  document.getElementById('voteModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
 });
 
 function closeModal() { document.getElementById('voteModal').classList.remove('open'); }
@@ -44,15 +37,11 @@ function closeModal() { document.getElementById('voteModal').classList.remove('o
 async function loadElections() {
   try {
     const res = await authFetch('/api/student/elections');
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || 'Failed');
-    }
+    if (!res.ok) throw new Error();
     renderElections(await res.json());
-  } catch (err) {
-    console.error('loadElections error:', err);
+  } catch {
     document.getElementById('electionsContainer').innerHTML =
-      `<div class="empty-state"><div class="empty-icon">⚠️</div><p>Failed to load elections: ${err.message}</p></div>`;
+      '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Failed to load elections.</p></div>';
   }
 }
 
@@ -67,12 +56,13 @@ function renderElections(elections) {
 
   elections.forEach(el => {
     const section = document.createElement('div');
+    section.className = 'election-section';
     section.style.marginBottom = '2.5rem';
 
     const hdr = document.createElement('div');
+    hdr.className = 'election-section-title';
     hdr.style.cssText = 'display:flex;align-items:center;gap:10px;margin-bottom:1.1rem';
-    hdr.innerHTML = `
-      <h2 style="font-size:1.1rem;font-weight:800;color:var(--gray-800)">${el.name}</h2>
+    hdr.innerHTML = `<h2 style="font-size:1.1rem;font-weight:800;color:var(--gray-800)">${el.name}</h2>
       <span class="section-badge">${el.type === 'positions' ? '🏛️ Positions' : '👤 Direct'}</span>
       <span class="yellow-accent">Active</span>`;
     section.appendChild(hdr);
@@ -93,7 +83,7 @@ function renderElections(elections) {
             <h3>${pos.name}</h3>
             <p>${pos.candidatesCount} candidate${pos.candidatesCount !== 1 ? 's' : ''}</p>
             ${pos.hasVoted
-              ? '<div style="display:inline-flex;align-items:center;gap:5px;margin-top:.75rem;font-size:.8rem;font-weight:700;color:var(--green-2)">✓ Voted</div>'
+              ? '<div class="voted-tick" style="display:inline-flex;align-items:center;gap:5px;margin-top:.75rem;font-size:.8rem;font-weight:700;color:var(--green-2)">✓ Voted</div>'
               : '<div class="card-cta">Vote →</div>'
             }`;
           if (!pos.hasVoted) card.addEventListener('click', () => openVoteModal(el.id, el.name, pos.id, pos.name));
@@ -109,7 +99,7 @@ function renderElections(elections) {
         <h3>${el.name}</h3>
         <p>${el.candidatesCount} candidate${el.candidatesCount !== 1 ? 's' : ''}</p>
         ${el.hasVoted
-          ? '<div style="display:inline-flex;align-items:center;gap:5px;margin-top:.75rem;font-size:.8rem;font-weight:700;color:var(--green-2)">✓ Voted</div>'
+          ? '<div class="voted-tick" style="display:inline-flex;align-items:center;gap:5px;margin-top:.75rem;font-size:.8rem;font-weight:700;color:var(--green-2)">✓ Voted</div>'
           : '<div class="card-cta">Cast Your Vote →</div>'
         }`;
       if (!el.hasVoted) card.addEventListener('click', () => openVoteModal(el.id, el.name, null, null));
@@ -134,7 +124,6 @@ async function openVoteModal(electionId, electionName, positionId, positionName)
     let url = `/api/student/candidates?electionId=${encodeURIComponent(electionId)}`;
     if (positionId) url += `&positionId=${encodeURIComponent(positionId)}`;
     const res = await authFetch(url);
-    if (!res.ok) throw new Error('Failed to load candidates');
     const { candidates, hasVoted } = await res.json();
     const list = document.getElementById('candidatesList');
     list.innerHTML = '';
@@ -164,9 +153,8 @@ async function openVoteModal(electionId, electionName, positionId, positionName)
       if (!hasVoted) row.querySelector('.btn-vote').addEventListener('click', () => castVote(c.id));
       list.appendChild(row);
     });
-  } catch (err) {
-    document.getElementById('candidatesList').innerHTML =
-      `<div class="empty-state"><div class="empty-icon">⚠️</div><p>${err.message}</p></div>`;
+  } catch {
+    document.getElementById('candidatesList').innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Error loading.</p></div>';
   }
 }
 
@@ -174,10 +162,13 @@ async function castVote(candidateId) {
   try {
     const body = { electionId: currentElectionId, candidateId };
     if (currentPositionId) body.positionId = currentPositionId;
-    const res  = await authFetch('/api/student/vote', { method: 'POST', body: JSON.stringify(body) });
+    const res = await authFetch('/api/student/vote', {
+      method: 'POST', body: JSON.stringify(body)
+    });
     const data = await res.json();
     if (res.ok) {
-      const parts = document.getElementById('modalTitle').textContent.split(' · ');
+      const titleText = document.getElementById('modalTitle').textContent;
+      const parts = titleText.split(' · ');
       await openVoteModal(currentElectionId, parts[0], currentPositionId, parts[1] || null);
       await loadElections();
     } else {
