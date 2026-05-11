@@ -101,11 +101,15 @@
   </div>
 </div>
 
-<!-- Firebase SDKs (compat version — works without bundler) -->
+<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
 <script src="/js/firebase-config.js"></script>
 <script>
+  // Init Firestore client
+  const fsdb = firebase.firestore();
+
   // Redirect if already logged in
   fbAuth.onAuthStateChanged(user => {
     if (user) window.location.href = '/student-dashboard';
@@ -114,11 +118,11 @@
   function showTab(tab) {
     const isLogin = tab === 'login';
     document.getElementById('loginForm').style.display  = isLogin ? 'flex' : 'none';
-    document.getElementById('signupForm').style.display = isLogin ? 'none' : 'flex';
+    document.getElementById('signupForm').style.display = isLogin ? 'none'  : 'flex';
     document.getElementById('tabLogin').classList.toggle('active', isLogin);
     document.getElementById('tabSignup').classList.toggle('active', !isLogin);
     document.getElementById('authTitle').textContent = isLogin ? 'Welcome back' : 'Join Vota';
-    document.getElementById('authSub').textContent = isLogin
+    document.getElementById('authSub').textContent   = isLogin
       ? 'Sign in to access the student voting portal.'
       : 'Create your account to start participating.';
   }
@@ -135,63 +139,66 @@
     btn.textContent = 'Signing in…'; btn.disabled = true;
     try {
       await fbAuth.signInWithEmailAndPassword(
-        document.getElementById('loginEmail').value,
+        document.getElementById('loginEmail').value.trim(),
         document.getElementById('loginPwd').value
       );
-      // onAuthStateChanged will redirect
+      // onAuthStateChanged handles redirect
     } catch (err) {
       showAlert('loginAlert', friendlyError(err.code), 'error');
       btn.textContent = 'Sign In →'; btn.disabled = false;
     }
   });
 
-  // SIGNUP
+  // SIGNUP — writes profile directly to Firestore from client
   document.getElementById('signupForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const btn = e.target.querySelector('.btn-submit');
-    btn.textContent = 'Creating…'; btn.disabled = true;
-    try {
-      const cred = await fbAuth.createUserWithEmailAndPassword(
-        document.getElementById('signupEmail').value,
-        document.getElementById('signupPwd').value
-      );
-      await cred.user.updateProfile({ displayName: document.getElementById('signupUsername').value });
+    const btn       = e.target.querySelector('.btn-submit');
+    const studentId = document.getElementById('signupId').value.trim();
+    const username  = document.getElementById('signupUsername').value.trim();
+    const email     = document.getElementById('signupEmail').value.trim();
+    const password  = document.getElementById('signupPwd').value;
 
-      // Save student profile to Firestore via server
-      const token = await cred.user.getIdToken();
-      const res = await fetch('/api/student/profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({
-          studentId: document.getElementById('signupId').value,
-          username:  document.getElementById('signupUsername').value,
-        }),
+    if (!studentId || !username) {
+      showAlert('signupAlert', 'Please fill in all fields', 'error'); return;
+    }
+
+    btn.textContent = 'Creating…'; btn.disabled = true;
+
+    try {
+      // 1. Create Firebase Auth account
+      const cred = await fbAuth.createUserWithEmailAndPassword(email, password);
+      const user = cred.user;
+
+      // 2. Set display name
+      await user.updateProfile({ displayName: username });
+
+      // 3. Write profile directly to Firestore from client
+      await fsdb.collection('students').doc(user.uid).set({
+        studentId,
+        username,
+        email,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       });
 
-      if (!res.ok) {
-        const data = await res.json();
-        await cred.user.delete();
-        showAlert('signupAlert', data.message || 'Signup failed', 'error');
-        btn.textContent = 'Create Account →'; btn.disabled = false;
-        return;
-      }
-
       showAlert('signupAlert', '✓ Account created — redirecting…', 'success');
-      // onAuthStateChanged will redirect
+      // onAuthStateChanged will redirect to dashboard
+
     } catch (err) {
-      showAlert('signupAlert', friendlyError(err.code), 'error');
+      console.error('Signup error:', err);
+      showAlert('signupAlert', friendlyError(err.code) || err.message, 'error');
       btn.textContent = 'Create Account →'; btn.disabled = false;
     }
   });
 
   function friendlyError(code) {
     const map = {
-      'auth/user-not-found':      'No account found with that email.',
-      'auth/wrong-password':      'Incorrect password.',
-      'auth/email-already-in-use':'That email is already registered.',
-      'auth/weak-password':       'Password must be at least 6 characters.',
-      'auth/invalid-email':       'Please enter a valid email address.',
-      'auth/too-many-requests':   'Too many attempts. Please wait and try again.',
+      'auth/user-not-found':       'No account found with that email.',
+      'auth/wrong-password':       'Incorrect password.',
+      'auth/invalid-credential':   'Incorrect email or password.',
+      'auth/email-already-in-use': 'That email is already registered.',
+      'auth/weak-password':        'Password must be at least 6 characters.',
+      'auth/invalid-email':        'Please enter a valid email address.',
+      'auth/too-many-requests':    'Too many attempts. Please wait and try again.',
     };
     return map[code] || 'Something went wrong. Please try again.';
   }

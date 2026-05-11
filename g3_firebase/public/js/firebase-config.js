@@ -1,12 +1,12 @@
 // ─── PASTE YOUR FIREBASE CONFIG HERE ──────────────────────────────
 // Get this from: Firebase Console → Project Settings → Your apps → Web app
 const firebaseConfig = {
-  apiKey:            "PASTE_YOUR_API_KEY",
-  authDomain:        "PASTE_YOUR_PROJECT_ID.firebaseapp.com",
-  projectId:         "PASTE_YOUR_PROJECT_ID",
-  storageBucket:     "PASTE_YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID",
-  appId:             "PASTE_YOUR_APP_ID",
+  apiKey: "AIzaSyD_yGkwppXQWH6c1cu7pC1Z-iGYhJfhYpo",
+  authDomain: "nsuk-vote.firebaseapp.com",
+  projectId: "nsuk-vote",
+  storageBucket: "nsuk-vote.firebasestorage.app",
+  messagingSenderId: "334517551345",
+  appId: "1:334517551345:web:4fd38c502648720234e950"
 };
 
 // Init Firebase
