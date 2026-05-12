@@ -3,60 +3,133 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Portal · Vota</title>
+  <title>Admin Portal · NSUK Vote</title>
   <link rel="stylesheet" href="/css/shared.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
 <body>
 <div class="auth-page">
+
   <div class="auth-left">
-    <div class="auth-left-bg"></div>
     <div class="auth-left-orb orb-1"></div>
     <div class="auth-left-orb orb-2"></div>
+    <div class="auth-left-orb orb-3"></div>
     <div class="auth-left-content">
+
       <div class="auth-left-logo">
-        <div class="logo-glass">⚙️</div>
-        <span class="brand-name">Vota Admin</span>
+        <div class="logo-glass">
+          <i data-lucide="shield-check" style="width:22px;height:22px;stroke:white"></i>
+        </div>
+        <span class="brand-name">NSUK <span>Vote</span></span>
       </div>
+
       <div class="auth-left-hero">
-        <h2>Manage elections with <span class="highlight">precision.</span></h2>
-        <p>Access the control panel to create elections, manage candidates, and view live results.</p>
+        <h2>Manage elections with <span class="highlight">confidence.</span></h2>
+        <p>Full control over student elections — create polls, manage candidates, toggle elections live, and monitor real-time results all from one dashboard.</p>
+        <div class="auth-stats">
+          <div class="stat-item">
+            <div class="stat-num">Full</div>
+            <div class="stat-label">Control</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">Live</div>
+            <div class="stat-label">Monitoring</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">Safe</div>
+            <div class="stat-label">Access</div>
+          </div>
+        </div>
       </div>
+
       <div class="auth-features">
-        <div class="feature-item"><div class="feature-icon">➕</div><span>Create &amp; manage elections</span></div>
-        <div class="feature-item"><div class="feature-icon">👥</div><span>Add &amp; remove candidates</span></div>
-        <div class="feature-item"><div class="feature-icon">📊</div><span>Live results dashboard</span></div>
+        <div class="feature-item">
+          <div class="feature-icon">
+            <i data-lucide="plus-circle" style="width:16px;height:16px;stroke:white"></i>
+          </div>
+          <div class="feature-text">
+            <strong>Create Elections</strong>
+            <span>Positions-based or direct candidate voting</span>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">
+            <i data-lucide="users" style="width:16px;height:16px;stroke:white"></i>
+          </div>
+          <div class="feature-text">
+            <strong>Manage Candidates</strong>
+            <span>Add, remove, and organise per position</span>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">
+            <i data-lucide="bar-chart-2" style="width:16px;height:16px;stroke:white"></i>
+          </div>
+          <div class="feature-text">
+            <strong>Live Results</strong>
+            <span>Real-time vote counts and progress bars</span>
+          </div>
+        </div>
       </div>
+
     </div>
   </div>
 
   <div class="auth-right">
     <div class="auth-form-wrap">
+
       <div class="auth-header-row">
         <div class="auth-brand-mini">
-          <div class="brand-dot-glass">⚙️</div>
-          <span class="brand-text">Admin Portal</span>
+          <div class="brand-dot-glass">
+            <i data-lucide="shield-check" style="width:20px;height:20px;stroke:white"></i>
+          </div>
+          <div class="brand-text">
+            <span class="brand-main">NSUK Vote</span>
+            <span class="brand-sub">Admin Portal</span>
+          </div>
         </div>
       </div>
+
+      <div class="uni-badge">
+        <i data-lucide="lock" style="width:13px;height:13px;stroke:var(--green-2)"></i>
+        Restricted Access — Authorised Staff Only
+      </div>
+
       <div class="auth-heading">
         <h1 class="auth-title">Admin Sign In</h1>
-        <p class="auth-subtitle">Sign in with your admin credentials.</p>
+        <p class="auth-subtitle">Sign in with your staff credentials to access the election control panel.</p>
       </div>
+
       <form class="auth-form" id="loginForm">
         <div class="form-field">
           <label>Email Address</label>
           <div class="field-wrap">
-            <input type="email" id="loginEmail" placeholder="admin@yourschool.edu" required>
+            <span class="field-icon"><i data-lucide="mail" style="width:15px;height:15px;stroke:var(--gray-400)"></i></span>
+            <input type="email" id="loginEmail" placeholder="admin@nsuk.edu.ng" required>
           </div>
         </div>
         <div class="form-field">
           <label>Password</label>
           <div class="field-wrap">
+            <span class="field-icon"><i data-lucide="lock" style="width:15px;height:15px;stroke:var(--gray-400)"></i></span>
             <input type="password" id="loginPwd" placeholder="Your password" required>
           </div>
         </div>
-        <button type="submit" class="btn-submit">Access Dashboard →</button>
-        <div class="alert" id="loginAlert"></div>
+        <button type="submit" class="btn-submit">
+          <i data-lucide="shield" style="width:16px;height:16px;stroke:white"></i>
+          Access Dashboard
+        </button>
+        <div class="alert" id="loginAlert">
+          <i data-lucide="alert-circle" style="width:15px;height:15px"></i>
+          <span id="loginAlertMsg"></span>
+        </div>
       </form>
+
+      <div class="auth-footer-note">
+        <i data-lucide="info" style="width:13px;height:13px;stroke:var(--gray-400)"></i>
+        Access is restricted. Contact your system administrator if you need help.
+      </div>
+
     </div>
   </div>
 </div>
@@ -65,7 +138,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
 <script src="/js/firebase-config.js"></script>
 <script>
-  // Check if already logged in and is admin
+  lucide.createIcons();
+
   fbAuth.onAuthStateChanged(async user => {
     if (user) {
       const token = await user.getIdTokenResult();
@@ -73,14 +147,16 @@
     }
   });
 
-  function showAlert(id, msg, type) {
-    const el = document.getElementById(id); el.textContent = msg; el.className = 'alert show ' + type;
+  function showAlert(msg, type) {
+    const alert = document.getElementById('loginAlert');
+    document.getElementById('loginAlertMsg').textContent = msg;
+    alert.className = 'alert show ' + type;
   }
 
   document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = e.target.querySelector('.btn-submit');
-    btn.textContent = 'Signing in…'; btn.disabled = true;
+    btn.style.opacity = '0.7'; btn.disabled = true;
     try {
       const cred = await fbAuth.signInWithEmailAndPassword(
         document.getElementById('loginEmail').value,
@@ -89,15 +165,19 @@
       const tokenResult = await cred.user.getIdTokenResult(true);
       if (!tokenResult.claims.admin) {
         await fbAuth.signOut();
-        showAlert('loginAlert', 'This account does not have admin access.', 'error');
-        btn.textContent = 'Access Dashboard →'; btn.disabled = false;
+        showAlert('This account does not have admin access.', 'error');
+        btn.style.opacity = '1'; btn.disabled = false;
         return;
       }
-      // onAuthStateChanged will redirect
     } catch (err) {
-      const map = { 'auth/user-not-found': 'No account found.', 'auth/wrong-password': 'Incorrect password.', 'auth/invalid-email': 'Invalid email.' };
-      showAlert('loginAlert', map[err.code] || 'Login failed.', 'error');
-      btn.textContent = 'Access Dashboard →'; btn.disabled = false;
+      const map = {
+        'auth/user-not-found':    'No account found.',
+        'auth/wrong-password':    'Incorrect password.',
+        'auth/invalid-credential':'Incorrect email or password.',
+        'auth/invalid-email':     'Invalid email address.',
+      };
+      showAlert(map[err.code] || 'Login failed.', 'error');
+      btn.style.opacity = '1'; btn.disabled = false;
     }
   });
 </script>

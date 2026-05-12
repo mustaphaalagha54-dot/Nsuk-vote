@@ -3,33 +3,82 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard · Vota</title>
+  <title>Dashboard · NSUK Vote</title>
   <link rel="stylesheet" href="/css/shared.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
 <body>
 <div class="dash-page">
+
   <header class="dash-header">
     <div class="dash-header-left">
-      <div class="dash-logo">🗳️</div>
-      <h1>Student Union Voting</h1>
+      <div class="dash-logo">
+        <i data-lucide="check-square" style="width:19px;height:19px;stroke:white"></i>
+      </div>
+      <div class="dash-header-brand">
+        <div class="hb-name">NSUK <span>Vote</span></div>
+        <div class="hb-sub">Student Portal</div>
+      </div>
     </div>
     <div class="dash-header-right">
       <div class="dash-user-chip">
         <div class="user-avatar" id="userInitial">?</div>
         <span id="username">Student</span>
       </div>
-      <button class="btn-logout" id="logoutBtn">Logout</button>
+      <button class="btn-logout" id="logoutBtn">
+        <i data-lucide="log-out" style="width:14px;height:14px;stroke:currentColor"></i>
+        Logout
+      </button>
     </div>
   </header>
 
   <main class="dash-body">
+
     <div class="dash-greeting">
-      <h2>Hello, <span id="greetName">there</span>! 👋</h2>
-      <p>Select an active election below and cast your votes.</p>
+      <h2>Hello, <span id="greetName">there</span> 👋</h2>
+      <p>Select an active election below and cast your votes. Each position allows one vote.</p>
     </div>
+
+    <!-- Stats strip — filled by JS -->
+    <div class="dash-stats" id="dashStats" style="display:none">
+      <div class="stat-card">
+        <div class="stat-card-icon">
+          <i data-lucide="vote" style="width:19px;height:19px;stroke:white"></i>
+        </div>
+        <div class="stat-card-body">
+          <div class="sc-num" id="statActive">—</div>
+          <div class="sc-label">Active Elections</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">
+          <i data-lucide="check-circle" style="width:19px;height:19px;stroke:white"></i>
+        </div>
+        <div class="stat-card-body">
+          <div class="sc-num" id="statVoted">—</div>
+          <div class="sc-label">Votes Cast</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">
+          <i data-lucide="clock" style="width:19px;height:19px;stroke:white"></i>
+        </div>
+        <div class="stat-card-body">
+          <div class="sc-num" id="statPending">—</div>
+          <div class="sc-label">Still Pending</div>
+        </div>
+      </div>
+    </div>
+
     <div id="electionsContainer">
-      <div class="empty-state"><div class="empty-icon">⏳</div><p>Loading elections…</p></div>
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i data-lucide="loader" style="width:26px;height:26px;stroke:var(--gray-400)"></i>
+        </div>
+        <p>Loading elections…</p>
+      </div>
     </div>
+
   </main>
 </div>
 
@@ -38,7 +87,9 @@
   <div class="modal-box">
     <div class="modal-header">
       <h2 id="modalTitle">Vote</h2>
-      <button class="modal-close" id="modalClose">✕</button>
+      <button class="modal-close" id="modalClose">
+        <i data-lucide="x" style="width:14px;height:14px;stroke:currentColor"></i>
+      </button>
     </div>
     <div class="modal-body" id="candidatesList"></div>
   </div>
@@ -49,5 +100,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
 <script src="/js/firebase-config.js"></script>
 <script src="/js/student-dashboard.js"></script>
+<script>lucide.createIcons();</script>
 </body>
 </html>

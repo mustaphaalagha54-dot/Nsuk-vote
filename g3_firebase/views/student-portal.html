@@ -3,114 +3,203 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Student Portal · Vota</title>
+  <title>Student Portal · NSUK Vote</title>
   <link rel="stylesheet" href="/css/shared.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
 <body>
 <div class="auth-page">
 
+  <!-- ── Left panel ── -->
   <div class="auth-left">
-    <div class="auth-left-bg"></div>
     <div class="auth-left-orb orb-1"></div>
     <div class="auth-left-orb orb-2"></div>
+    <div class="auth-left-orb orb-3"></div>
     <div class="auth-left-content">
+
+      <!-- Logo -->
       <div class="auth-left-logo">
-        <div class="logo-glass">🗳️</div>
-        <span class="brand-name">Vota</span>
+        <div class="logo-glass">
+          <i data-lucide="check-square" style="width:22px;height:22px;stroke:white"></i>
+        </div>
+        <span class="brand-name">NSUK <span>Vote</span></span>
       </div>
+
+      <!-- Hero -->
       <div class="auth-left-hero">
         <h2>Your voice <span class="highlight">shapes</span> the future.</h2>
-        <p>Cast your vote for student representatives and make your opinion count.</p>
-      </div>
-      <div class="auth-features">
-        <div class="feature-item"><div class="feature-icon">🔒</div><span>Secure &amp; anonymous voting</span></div>
-        <div class="feature-item"><div class="feature-icon">⚡</div><span>Real-time results</span></div>
-        <div class="feature-item"><div class="feature-icon">✅</div><span>One vote per position</span></div>
-      </div>
-    </div>
-  </div>
+        <p>Cast your vote for student representatives and make your opinion count in union elections. Secure, transparent, and instant.</p>
 
-  <div class="auth-right">
-    <div class="auth-form-wrap">
-      <div class="auth-header-row">
-        <div class="auth-brand-mini">
-          <div class="brand-dot-glass">🗳️</div>
-          <span class="brand-text">Student Portal</span>
+        <!-- Stats -->
+        <div class="auth-stats">
+          <div class="stat-item">
+            <div class="stat-num">100%</div>
+            <div class="stat-label">Secure</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">Live</div>
+            <div class="stat-label">Results</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">1</div>
+            <div class="stat-label">Vote each</div>
+          </div>
         </div>
       </div>
 
-      <div class="auth-heading">
-        <h1 class="auth-title" id="authTitle">Welcome back</h1>
-        <p class="auth-subtitle" id="authSub">Sign in to access the student voting portal.</p>
+      <!-- Features -->
+      <div class="auth-features">
+        <div class="feature-item">
+          <div class="feature-icon">
+            <i data-lucide="shield-check" style="width:16px;height:16px;stroke:white"></i>
+          </div>
+          <div class="feature-text">
+            <strong>Secure &amp; Anonymous</strong>
+            <span>Your vote is private and tamper-proof</span>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">
+            <i data-lucide="zap" style="width:16px;height:16px;stroke:white"></i>
+          </div>
+          <div class="feature-text">
+            <strong>Real-time Results</strong>
+            <span>Watch live tallies update instantly</span>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">
+            <i data-lucide="users" style="width:16px;height:16px;stroke:white"></i>
+          </div>
+          <div class="feature-text">
+            <strong>Multiple Elections</strong>
+            <span>Vote across all active student positions</span>
+          </div>
+        </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- ── Right panel ── -->
+  <div class="auth-right">
+    <div class="auth-form-wrap">
+
+      <!-- Brand -->
+      <div class="auth-header-row">
+        <div class="auth-brand-mini">
+          <div class="brand-dot-glass">
+            <i data-lucide="check-square" style="width:20px;height:20px;stroke:white"></i>
+          </div>
+          <div class="brand-text">
+            <span class="brand-main">NSUK Vote</span>
+            <span class="brand-sub">Student Portal</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- University badge -->
+      <div class="uni-badge">
+        <i data-lucide="landmark" style="width:13px;height:13px;stroke:var(--green-2)"></i>
+        Nasarawa State University, Keffi
+      </div>
+
+      <!-- Heading -->
+      <div class="auth-heading">
+        <h1 class="auth-title" id="authTitle">Welcome back</h1>
+        <p class="auth-subtitle" id="authSub">Sign in to your student account to access active elections.</p>
+      </div>
+
+      <!-- Tabs -->
       <div class="auth-tabs">
         <button class="auth-tab active" id="tabLogin" onclick="showTab('login')">Login</button>
         <button class="auth-tab" id="tabSignup" onclick="showTab('signup')">Sign Up</button>
       </div>
 
-      <!-- Login -->
+      <!-- Login form -->
       <form class="auth-form" id="loginForm">
         <div class="form-field">
           <label>Email Address</label>
           <div class="field-wrap">
-            <input type="email" id="loginEmail" placeholder="you@university.edu" required>
+            <span class="field-icon"><i data-lucide="mail" style="width:15px;height:15px;stroke:var(--gray-400)"></i></span>
+            <input type="email" id="loginEmail" placeholder="you@nsuk.edu.ng" required>
           </div>
         </div>
         <div class="form-field">
           <label>Password</label>
           <div class="field-wrap">
+            <span class="field-icon"><i data-lucide="lock" style="width:15px;height:15px;stroke:var(--gray-400)"></i></span>
             <input type="password" id="loginPwd" placeholder="Your password" required>
           </div>
         </div>
-        <button type="submit" class="btn-submit">Sign In →</button>
-        <div class="alert" id="loginAlert"></div>
+        <button type="submit" class="btn-submit">
+          <i data-lucide="log-in" style="width:16px;height:16px;stroke:white"></i>
+          Sign In
+        </button>
+        <div class="alert" id="loginAlert">
+          <i data-lucide="alert-circle" style="width:15px;height:15px"></i>
+          <span id="loginAlertMsg"></span>
+        </div>
       </form>
 
-      <!-- Signup -->
+      <!-- Signup form -->
       <form class="auth-form" id="signupForm" style="display:none">
         <div class="form-field">
           <label>Student ID</label>
           <div class="field-wrap">
-            <input type="text" id="signupId" placeholder="e.g. STU2024001" required>
+            <span class="field-icon"><i data-lucide="credit-card" style="width:15px;height:15px;stroke:var(--gray-400)"></i></span>
+            <input type="text" id="signupId" placeholder="e.g. NSUK/2024/001" required>
           </div>
         </div>
         <div class="form-field">
           <label>Full Name</label>
           <div class="field-wrap">
+            <span class="field-icon"><i data-lucide="user" style="width:15px;height:15px;stroke:var(--gray-400)"></i></span>
             <input type="text" id="signupUsername" placeholder="Your full name" required>
           </div>
         </div>
         <div class="form-field">
           <label>Email Address</label>
           <div class="field-wrap">
-            <input type="email" id="signupEmail" placeholder="you@university.edu" required>
+            <span class="field-icon"><i data-lucide="mail" style="width:15px;height:15px;stroke:var(--gray-400)"></i></span>
+            <input type="email" id="signupEmail" placeholder="you@nsuk.edu.ng" required>
           </div>
         </div>
         <div class="form-field">
           <label>Password</label>
           <div class="field-wrap">
+            <span class="field-icon"><i data-lucide="lock" style="width:15px;height:15px;stroke:var(--gray-400)"></i></span>
             <input type="password" id="signupPwd" placeholder="Min 6 characters" required>
           </div>
         </div>
-        <button type="submit" class="btn-submit">Create Account →</button>
-        <div class="alert" id="signupAlert"></div>
+        <button type="submit" class="btn-submit">
+          <i data-lucide="user-plus" style="width:16px;height:16px;stroke:white"></i>
+          Create Account
+        </button>
+        <div class="alert" id="signupAlert">
+          <i data-lucide="alert-circle" style="width:15px;height:15px"></i>
+          <span id="signupAlertMsg"></span>
+        </div>
       </form>
+
+      <!-- Footer note -->
+      <div class="auth-footer-note">
+        <i data-lucide="shield" style="width:13px;height:13px;stroke:var(--gray-400)"></i>
+        Your data is protected and your vote is anonymous.
+      </div>
 
     </div>
   </div>
 </div>
 
-<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
 <script src="/js/firebase-config.js"></script>
 <script>
-  // Init Firestore client
+  lucide.createIcons();
   const fsdb = firebase.firestore();
 
-  // Redirect if already logged in
   fbAuth.onAuthStateChanged(user => {
     if (user) window.location.href = '/student-dashboard';
   });
@@ -121,72 +210,54 @@
     document.getElementById('signupForm').style.display = isLogin ? 'none'  : 'flex';
     document.getElementById('tabLogin').classList.toggle('active', isLogin);
     document.getElementById('tabSignup').classList.toggle('active', !isLogin);
-    document.getElementById('authTitle').textContent = isLogin ? 'Welcome back' : 'Join Vota';
-    document.getElementById('authSub').textContent   = isLogin
-      ? 'Sign in to access the student voting portal.'
-      : 'Create your account to start participating.';
+    document.getElementById('authTitle').textContent = isLogin ? 'Welcome back' : 'Create account';
+    document.getElementById('authSub').textContent = isLogin
+      ? 'Sign in to your student account to access active elections.'
+      : 'Register with your student ID to start participating.';
   }
 
-  function showAlert(id, msg, type) {
-    const el = document.getElementById(id);
-    el.textContent = msg; el.className = 'alert show ' + type;
+  function showAlert(formId, msg, type) {
+    const alert = document.getElementById(formId + 'Alert');
+    const msgEl = document.getElementById(formId + 'AlertMsg');
+    msgEl.textContent = msg;
+    alert.className = 'alert show ' + type;
   }
 
-  // LOGIN
   document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = e.target.querySelector('.btn-submit');
-    btn.textContent = 'Signing in…'; btn.disabled = true;
+    btn.style.opacity = '0.7'; btn.disabled = true;
     try {
       await fbAuth.signInWithEmailAndPassword(
         document.getElementById('loginEmail').value.trim(),
         document.getElementById('loginPwd').value
       );
-      // onAuthStateChanged handles redirect
     } catch (err) {
-      showAlert('loginAlert', friendlyError(err.code), 'error');
-      btn.textContent = 'Sign In →'; btn.disabled = false;
+      showAlert('login', friendlyError(err.code), 'error');
+      btn.style.opacity = '1'; btn.disabled = false;
     }
   });
 
-  // SIGNUP — writes profile directly to Firestore from client
   document.getElementById('signupForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const btn       = e.target.querySelector('.btn-submit');
+    const btn = e.target.querySelector('.btn-submit');
     const studentId = document.getElementById('signupId').value.trim();
     const username  = document.getElementById('signupUsername').value.trim();
     const email     = document.getElementById('signupEmail').value.trim();
     const password  = document.getElementById('signupPwd').value;
-
-    if (!studentId || !username) {
-      showAlert('signupAlert', 'Please fill in all fields', 'error'); return;
-    }
-
-    btn.textContent = 'Creating…'; btn.disabled = true;
-
+    if (!studentId || !username) { showAlert('signup', 'Please fill in all fields', 'error'); return; }
+    btn.style.opacity = '0.7'; btn.disabled = true;
     try {
-      // 1. Create Firebase Auth account
       const cred = await fbAuth.createUserWithEmailAndPassword(email, password);
-      const user = cred.user;
-
-      // 2. Set display name
-      await user.updateProfile({ displayName: username });
-
-      // 3. Write profile directly to Firestore from client
-      await fsdb.collection('students').doc(user.uid).set({
-        studentId,
-        username,
-        email,
+      await cred.user.updateProfile({ displayName: username });
+      await fsdb.collection('students').doc(cred.user.uid).set({
+        studentId, username, email,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       });
-
-      showAlert('signupAlert', '✓ Account created — redirecting…', 'success');
-      // onAuthStateChanged will redirect to dashboard
-
+      showAlert('signup', '✓ Account created — redirecting…', 'success');
     } catch (err) {
-      console.error('Signup error:', err);
-      showAlert('signupAlert', friendlyError(err.code) || err.message, 'error');
-      btn.textContent = 'Create Account →'; btn.disabled = false;
+      showAlert('signup', friendlyError(err.code) || err.message, 'error');
+      btn.style.opacity = '1'; btn.disabled = false;
     }
   });
 
@@ -198,7 +269,7 @@
       'auth/email-already-in-use': 'That email is already registered.',
       'auth/weak-password':        'Password must be at least 6 characters.',
       'auth/invalid-email':        'Please enter a valid email address.',
-      'auth/too-many-requests':    'Too many attempts. Please wait and try again.',
+      'auth/too-many-requests':    'Too many attempts. Please wait.',
     };
     return map[code] || 'Something went wrong. Please try again.';
   }
