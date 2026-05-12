@@ -392,6 +392,32 @@ app.post('/api/student/vote', requireAuth, async (req, res) => {
 
 // ── Results (admin) ───────────────────────────────────────
 
+
+// ── Per-election candidates (used by manage modal) ────────
+
+app.get('/api/elections/:id/results', requireAdmin, async (req, res) => {
+  try {
+    const elDoc = await db.collection('elections').doc(req.params.id).get();
+    if (!elDoc.exists) return res.status(404).json({ message: 'Election not found' });
+
+    const candSnap   = await db.collection('elections').doc(req.params.id)
+      .collection('candidates').get();
+    const candidates = candSnap.docs.map(c => ({ id: c.id, ...c.data() }));
+
+    const voteSnap = await db.collection('elections').doc(req.params.id)
+      .collection('votes').get();
+
+    res.json({
+      election:   { id: elDoc.id, ...elDoc.data() },
+      candidates,
+      totalVotes: voteSnap.size,
+    });
+  } catch (err) {
+    console.error('election results error:', err);
+    res.status(500).json({ message: 'Internal server error', detail: err.message });
+  }
+});
+
 app.get('/api/results', requireAdmin, async (req, res) => {
   try {
     const snap    = await db.collection('elections').get();

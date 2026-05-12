@@ -19,22 +19,28 @@ document.addEventListener('DOMContentLoaded', () => {
   fbAuth.onAuthStateChanged(async user => {
     if (!user) { window.location.href = '/student'; return; }
 
-    // Profile
+    // Reload user to get latest auth profile
+    try { await user.reload(); } catch (e) { console.warn('reload failed', e); }
+    const freshUser = fbAuth.currentUser;
+
+    // Fetch name — Firestore first, fallback to Auth displayName
+    let name = 'Student';
     try {
       const fsdb = firebase.firestore();
-      const doc  = await fsdb.collection('students').doc(user.uid).get();
-      const name = doc.exists
-        ? (doc.data().username || user.displayName || 'Student')
-        : (user.displayName || 'Student');
-      document.getElementById('username').textContent    = name;
-      document.getElementById('greetName').textContent   = name;
-      document.getElementById('userInitial').textContent = name.charAt(0).toUpperCase();
-    } catch {
-      const name = user.displayName || 'Student';
-      document.getElementById('username').textContent    = name;
-      document.getElementById('greetName').textContent   = name;
-      document.getElementById('userInitial').textContent = name.charAt(0).toUpperCase();
+      const doc  = await fsdb.collection('students').doc(freshUser.uid).get();
+      if (doc.exists && doc.data().username) {
+        name = doc.data().username;
+      } else if (freshUser.displayName) {
+        name = freshUser.displayName;
+      }
+    } catch (err) {
+      console.error('Profile fetch error:', err);
+      if (freshUser.displayName) name = freshUser.displayName;
     }
+
+    document.getElementById('username').textContent    = name;
+    document.getElementById('greetName').textContent   = name;
+    document.getElementById('userInitial').textContent = name.charAt(0).toUpperCase();
 
     await loadElections();
   });
